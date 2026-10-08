@@ -66,7 +66,7 @@ export default function LoginForm() {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-[#1a3c6e]">Welcome Back</h2>
         <p className="text-gray-500 mt-2 text-[15px]">
-          Select your account type to continue
+          Select your account type to continue   
         </p>
       </div>
 
