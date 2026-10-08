@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+/* Ensure all app source files are scanned for utility classes */
+@source "../**/*.{js,ts,jsx,tsx,mdx}";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme {
+  --color-primary: #012E7C;
+  --color-secondary: #14B8A6;
+  --color-accent: #00DEB6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* --background: #0a0a0a; */
+    --foreground: #ededed;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), "Inter", sans-serif;
+  scroll-behavior: smooth;
+}
+
+
+/* ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+} */
+/* 
+::-webkit-scrollbar-track {
+  background: #dfdfdf00;
+} */
+
+ /* ::-webkit-scrollbar-thumb {
+  background: #f6f6f6;
+  border-radius: 10px;
+}  */
+
+
+.inter {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.ant-layout-sider-trigger {
+  background: var(--color-primary) !important;
+}
+
+.ant-menu-item-selected {
+  border-left: 4px solid var(--color-primary) !important;
+  border-right: none !important;
+  background-color: rgba(26, 60, 110, 0.05) !important;
+}
+
+.ant-menu-item {
+  border-radius: 0 !important;
+  margin-block: 4px !important;
+}
+
+.ant-menu-item-selected .ant-menu-item-icon {
+  color: var(--color-primary) !important;
+}
+
+/* Jodit editor custom styles */
+.jodit-container {
+  border-radius: 6px !important;
+}
+
+.jodit-toolbar {
+  border-radius: 6px 6px 0 0 !important;
+}
+
+.jodit-workplace {
+  border-radius: 0 0 6px 6px !important;
+}
+
+.active {
+  color: white;
+}
+
+
+/* --------------- Swiper Pagination Styles --------------- */
+.swiper-pagination-bullet {
+  background-color: #d1d5db;
+  /* gray-300 */
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #f5a623;
+}
+/* Global Autofill fix to remove blue background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+    -webkit-text-fill-color: inherit !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Remove Ant Design default blue focus shadow */
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+    box-shadow: none !important;
+    border-color: #1a3c6e !important;
+}
+
+/* Force background color on all inputs to avoid browser blue */
+input {
+    background-color: transparent !important;
+}
+
