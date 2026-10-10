@@ -6,7 +6,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
-import { Listing } from "@/types/listing";
+import { Listing, getListingId, ApiListingStatus } from "@/types/listing";
 import ListingsFilters from "./ListingsFilters";
 import ListingsTable from "./ListingsTable";
 import ListingModal from "./add-listing/AddListingModal";
@@ -51,6 +51,14 @@ export default function MyListingsPage({
     searchParams.get("status") || "all",
   );
   const [notificationApi, contextHolder] = notification.useNotification();
+
+  // Local listings state for instant optimistic updates
+  const [localListings, setLocalListings] = useState<Listing[]>(listings);
+  const [updatingListingId, setUpdatingListingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLocalListings(listings);
+  }, [listings]);
 
   // Add / Edit modal
   const [listingModalOpen, setListingModalOpen] = useState(false);
@@ -125,6 +133,10 @@ export default function MyListingsPage({
         "client",
       );
 
+      setLocalListings((prev) =>
+        prev.filter((item) => getListingId(item) !== id),
+      );
+
       await revalidateTags(["agent-listings"]);
       router.refresh();
 
@@ -146,6 +158,67 @@ export default function MyListingsPage({
 
     setDeleteModalOpen(false);
     setListingToDelete(null);
+  };
+
+  const handleUpdateMarketStatus = async (
+    id: string,
+    newMarketStatus: string,
+  ) => {
+    setUpdatingListingId(id);
+    try {
+      const res: any = await apiFetch(
+        `/listings/my/market-status/${id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ marketStatus: newMarketStatus }),
+        },
+        "client",
+      );
+
+      // Instant optimistic update on local listings state
+      setLocalListings((prev) =>
+        prev.map((item) => {
+          if (getListingId(item) === id) {
+            return {
+              ...item,
+              marketStatus: newMarketStatus,
+              status:
+                newMarketStatus === "SOLD"
+                  ? ("SOLD" as ApiListingStatus)
+                  : item.status === "SOLD"
+                  ? ("PUBLISHED" as ApiListingStatus)
+                  : item.status,
+              ...(res?.data || {}),
+            };
+          }
+          return item;
+        }),
+      );
+
+      // Revalidate Next.js cache and refresh
+      await revalidateTags(["agent-listings"]);
+      router.refresh();
+
+      const readableStatus = newMarketStatus.replace(/_/g, " ");
+      notificationApi.success({
+        message: "Market Status Updated",
+        description:
+          res?.message ||
+          `Property market status changed to ${readableStatus}.`,
+        placement: "topRight",
+      });
+      toast.success(res?.message || `Status updated to ${readableStatus}`);
+    } catch (error: any) {
+      console.error("Failed to update market status:", error);
+      notificationApi.error({
+        message: "Failed to update market status",
+        description: error?.message || "Please try again later.",
+        placement: "topRight",
+      });
+      toast.error(error?.message || "Failed to update market status");
+    } finally {
+      setUpdatingListingId(null);
+    }
   };
 
   const handleDetails = (id: string) => {
@@ -227,12 +300,14 @@ export default function MyListingsPage({
             onStatusChange={handleStatusChange}
           />
           <ListingsTable
-            listings={listings}
+            listings={localListings}
             onDelete={handleDeleteRequest}
             onDetails={handleDetails}
             onEdit={handleEdit}
             meta={meta}
             onPageChange={handlePageChange}
+            onMarketStatusChange={handleUpdateMarketStatus}
+            updatingListingId={updatingListingId}
           />
         </div>
       </div>

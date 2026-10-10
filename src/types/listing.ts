@@ -19,6 +19,19 @@ export type ApiListingStatus =
   | "CLOSED"
   | "ARCHIVED";
 
+/** Market statuses for agent management & badges */
+export const MARKET_STATUS = {
+  AVAILABLE: "AVAILABLE",
+  SOLD_STC: "SOLD_STC",
+  SOLD: "SOLD",
+  RECENTLY_RELISTED: "RECENTLY_RELISTED",
+  BACK_ON_MARKET: "BACK_ON_MARKET",
+} as const;
+
+export type MarketStatus =
+  | (typeof MARKET_STATUS)[keyof typeof MARKET_STATUS]
+  | string;
+
 /** Statuses that must not change when the agent updates listing details */
 export const LISTING_STATUSES_PRESERVE_ON_UPDATE: readonly CoreListingStatus[] = [
   LISTING_STATUS.REJECTED,
@@ -142,7 +155,7 @@ export interface Listing {
   leadsCount: number;
   leads?: ListingLead[];
   status: ApiListingStatus;
-  marketStatus?: string;
+  marketStatus?: MarketStatus;
   badges?: PropertyBadge[];
   primaryBadge?: PropertyBadge | null;
   firstPublishedAt?: string;

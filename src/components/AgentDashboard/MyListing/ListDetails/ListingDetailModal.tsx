@@ -20,6 +20,8 @@ import { useState, useEffect } from "react";
 import { StatusBadge } from "../ListingsTable";
 import { apiFetch, getImage } from "@/lib/api-fech";
 import ImageGallery from "./Imagegallery";
+import PropertyBadge from "@/components/common/PropertyBadge";
+import { getPrimaryBadge } from "@/lib/badge-utils";
 
 
 interface ListingDetailModalProps {
@@ -124,7 +126,12 @@ export default function ListingDetailModal({ listingId, open, onClose }: Listing
         !loading && detail ? (
           <div className="flex items-center justify-between pr-8">
             <span className="text-lg font-bold text-gray-900 truncate">{detail?.title}</span>
-            <StatusBadge status={detail?.status} />
+            <div className="flex items-center gap-2">
+              <StatusBadge status={detail?.status} />
+              {getPrimaryBadge(detail) && (
+                <PropertyBadge badge={getPrimaryBadge(detail)!} size="xs" />
+              )}
+            </div>
           </div>
         ) : (
           <Skeleton.Input active size="small" className="!w-48" />
